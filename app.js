@@ -1,26 +1,5 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    onSnapshot, 
-    query, 
-    orderBy 
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-// Your verified Firebase configuration object
-const firebaseConfig = {
-  apiKey: "AIzaSyCAA4EePd4HIC7kBdA1cO281bP7BNEiv6Y",
-  authDomain: "interactive-quiz-leaderboard.firebaseapp.com",
-  projectId: "interactive-quiz-leaderboard",
-  storageBucket: "interactive-quiz-leaderboard.firebasestorage.app",
-  messagingSenderId: "951145713415",
-  appId: "1:951145713415:web:ca41543c35d60133abbfa2",
-  measurementId: "G-WTG80NBW1C"
-};
-
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// --- GOOGLE SHEETS CONFIGURATION ---
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwzgNsTphikqF9QNSYtEy5J1tAxyvdaRwXhcdiCNnw6eesMmzm2IBmANdiqV8fWxG-W/exec";
 
 // Complete 5 magical multiple choice questions
 const quizQuestions = [
@@ -64,7 +43,6 @@ function loadQuestion() {
     let currentQuestion = quizQuestions[currentQuestionIndex];
     questionText.innerText = currentQuestion.q;
     
-    // Smooth dynamic update to matching progress tracking metric
     progressBar.style.width = `${(currentQuestionIndex / quizQuestions.length) * 100}%`;
 
     currentQuestion.options.forEach((option, index) => {
@@ -84,16 +62,14 @@ function resetState() {
 function selectOption(selectedButton, selectedIndex, correctIndex) {
     const allButtons = optionsContainer.querySelectorAll(".option-btn");
     
-    // Instantly highlight answers dynamically with visual color cues
     if (selectedIndex === correctIndex) {
         score++;
         selectedButton.classList.add("correct-choice");
     } else {
         selectedButton.classList.add("wrong-choice");
-        allButtons[correctIndex].classList.add("correct-choice"); // Reveal the correct answer nicely
+        allButtons[correctIndex].classList.add("correct-choice");
     }
 
-    // Freeze buttons
     allButtons.forEach(btn => btn.disabled = true);
     nextBtn.style.display = "block";
 }
@@ -103,7 +79,6 @@ nextBtn.addEventListener("click", () => {
     if (currentQuestionIndex < quizQuestions.length) {
         loadQuestion();
     } else {
-        // Switch view cleanly to Gateway submission screen
         progressBar.style.width = "100%";
         quizScreen.style.display = "none";
         submissionScreen.style.display = "block";
@@ -111,7 +86,9 @@ nextBtn.addEventListener("click", () => {
     }
 });
 
-// Write user performance data to DB
+// --- GOOGLE SHEETS API INTERACTIONS ---
+
+// Write user performance data to Google Sheets
 submitScoreBtn.addEventListener("click", async () => {
     const name = usernameInput.value.trim();
     if (!name) {
@@ -119,51 +96,81 @@ submitScoreBtn.addEventListener("click", async () => {
         return;
     }
 
+    // Temporarily disable button to prevent multiple submissions
+    submitScoreBtn.disabled = true;
+    submitScoreBtn.innerText = "Submitting...";
+
     try {
-        await addDoc(collection(db, "leaderboard"), {
+        const payload = {
             name: name,
             score: score,
-            timestamp: new Date() // Secondary tie breaking parameter
+            timestamp: new Date().toISOString()
+        };
+
+        await fetch(SCRIPT_URL, {
+            method: "POST",
+            mode: "no-cors", // Required for Google Apps Script redirects
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
         });
         
-        // Advance into the grand finale gateway view
+        // Advance to leaderboard view and fetch fresh rankings
         submissionScreen.style.display = "none";
         leaderboardScreen.style.display = "block";
+        fetchLeaderboard();
     } catch (error) {
-        console.error("Database connection failure: ", error);
+        console.error("Sheets connection failure: ", error);
+        alert("Oops! Something went wrong submitting your score.");
+    } finally {
+        submitScoreBtn.disabled = false;
+        submitScoreBtn.innerText = "Enter Gateway ➔";
     }
 });
 
-// Sort by highest score first, then fallback to earliest time registered
-const leaderboardQuery = query(
-    collection(db, "leaderboard"), 
-    orderBy("score", "desc"), 
-    orderBy("timestamp", "asc")
-);
+// Fetch and sort data from Google Sheets
+async function fetchLeaderboard() {
+    leaderboardRows.innerHTML = "<tr><td colspan='3'>Loading magical standings...</td></tr>";
+    
+    try {
+        const response = await fetch(SCRIPT_URL);
+        let data = await response.json();
 
-// Realtime sync listeners
-onSnapshot(leaderboardQuery, (snapshot) => {
-    leaderboardRows.innerHTML = "";
-    let rank = 1;
-    snapshot.forEach((doc) => {
-        const data = doc.data();
-        // Dynamic decorative rank placement badges
-        let rankBadge = rank;
-        if (rank === 1) rankBadge = "🥇";
-        if (rank === 2) rankBadge = "🥈";
-        if (rank === 3) rankBadge = "🥉";
+        // Tie-breaker Sort: Highest score first. If tied, sort by earliest timestamp.
+        data.sort((a, b) => {
+            if (b.score !== a.score) {
+                return b.score - a.score;
+            }
+            return new Date(a.timestamp) - new Date(b.timestamp);
+        });
 
-        const row = `<tr>
-            <td>${rankBadge}</td>
-            <td>${data.name}</td>
-            <td>${data.score} pts</td>
-        </tr>`;
-        leaderboardRows.innerHTML += row;
-        rank++;
-    });
+        leaderboardRows.innerHTML = "";
+        let rank = 1;
+
+        data.forEach((player) => {
+            let rankBadge = rank;
+            if (rank === 1) rankBadge = "🥇";
+            if (rank === 2) rankBadge = "🥈";
+            if (rank === 3) rankBadge = "🥉";
+
+            const row = `<tr>
+                <td>${rankBadge}</td>
+                <td>${player.name || "Anonymous Hero"}</td>
+                <td>${player.score} pts</td>
+            </tr>`;
+            leaderboardRows.innerHTML += row;
+            rank++;
+        });
+    } catch (error) {
+        console.error("Error reading leaderboard:", error);
+        leaderboardRows.innerHTML = "<tr><td colspan='3'>Could not load Hall of Fame 😢</td></tr>";
+    }
+}
+
+restartBtn.addEventListener("click", () => {
+    startQuiz();
 });
 
-restartBtn.addEventListener("click", startQuiz);
-
-// Initialize interaction loop
+// Initialize app
 startQuiz();

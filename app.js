@@ -142,7 +142,11 @@ async function fetchLeaderboard() {
     leaderboardRows.innerHTML = "<tr><td colspan='3'>Loading magical standings...</td></tr>";
     
     try {
-        const response = await fetch(SCRIPT_URL);
+        // Cache Buster: Adds a unique timestamp to the end of the URL (?_cb=12345678)
+        // This tricks the browser into always pulling live data instead of a cached version!
+        const cacheBusterUrl = SCRIPT_URL + (SCRIPT_URL.includes('?') ? '&' : '?') + '_cb=' + new Date().getTime();
+        
+        const response = await fetch(cacheBusterUrl);
         let data = await response.json();
 
         // Tie-breaker Sort: Highest score first. If tied, sort by earliest timestamp.

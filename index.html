@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tech Club Quiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Quiz Section -->
+        <div id="quiz-container">
+            <h2>General Knowledge Quiz</h2>
+            <div id="question-box">
+                <p id="question-text">Question will appear here...</p>
+                <div id="options-container"></div>
+            </div>
+            <button id="next-btn" style="display: none;">Next Question</button>
+        </div>
+
+        <!-- Submission Section (Hidden Initially) -->
+        <div id="submission-container" style="display: none;">
+            <h2>Quiz Completed!</h2>
+            <p>Your Score: <span id="final-score">0</span>/5</p>
+            <input type="text" id="username" placeholder="Enter your name" required>
+            <button id="submit-score-btn">Submit to Leaderboard</button>
+        </div>
+
+        <!-- Leaderboard Section -->
+        <div id="leaderboard-container">
+            <h2>Leaderboard</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Rank</th>
+                        <th>Name</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-rows">
+                    <!-- Dynamic rows will go here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs (Using CDN v9+) -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>

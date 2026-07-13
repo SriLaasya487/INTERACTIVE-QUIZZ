@@ -3,48 +3,62 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tech Club Quiz</title>
+    <title>✨ Whimsical Tech Quiz ✨</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Sweet Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <div class="sparkle-background"></div>
+    
     <div class="container">
-        <!-- Quiz Section -->
-        <div id="quiz-container">
-            <h2>General Knowledge Quiz</h2>
+        <!-- Quiz Screen -->
+        <div id="quiz-screen">
+            <h1 class="title">✨ Trivia Magic ✨</h1>
+            <div class="progress-bar-container">
+                <div id="progress-bar" style="width: 0%;"></div>
+            </div>
             <div id="question-box">
-                <p id="question-text">Question will appear here...</p>
+                <p id="question-text">Loading magical questions...</p>
                 <div id="options-container"></div>
             </div>
-            <button id="next-btn" style="display: none;">Next Question</button>
+            <button id="next-btn" class="magic-btn next-btn" style="display: none;">Next ✨</button>
         </div>
 
-        <!-- Submission Section (Hidden Initially) -->
-        <div id="submission-container" style="display: none;">
-            <h2>Quiz Completed!</h2>
-            <p>Your Score: <span id="final-score">0</span>/5</p>
-            <input type="text" id="username" placeholder="Enter your name" required>
-            <button id="submit-score-btn">Submit to Leaderboard</button>
+        <!-- Submission Screen -->
+        <div id="submission-screen" style="display: none;">
+            <h1 class="title">🎉 Yay! Finished! 🎉</h1>
+            <div class="score-badge">
+                <span id="final-score">0</span> / 5
+            </div>
+            <p class="subtitle">Claim your spot on the magical leaderboard!</p>
+            <div class="input-group">
+                <input type="text" id="username" placeholder="Type your name..." autocomplete="off">
+                <button id="submit-score-btn" class="magic-btn submit-btn">Enter Gateway ➔</button>
+            </div>
         </div>
 
-        <!-- Leaderboard Section -->
-        <div id="leaderboard-container">
-            <h2>Leaderboard</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Name</th>
-                        <th>Score</th>
-                    </tr>
-                </thead>
-                <tbody id="leaderboard-rows">
-                    <!-- Dynamic rows will go here -->
-                </tbody>
-            </table>
+        <!-- Leaderboard Screen -->
+        <div id="leaderboard-screen" style="display: none;">
+            <h1 class="title">🏆 Hall of Fame 🏆</h1>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Hero</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="leaderboard-rows">
+                        <!-- Dynamic cute rows -->
+                    </tbody>
+                </table>
+            </div>
+            <button id="restart-btn" class="magic-btn restart-btn">Play Again 🔄</button>
         </div>
     </div>
 
-    <!-- Firebase SDKs (Using CDN v9+) -->
     <script type="module" src="app.js"></script>
 </body>
 </html>

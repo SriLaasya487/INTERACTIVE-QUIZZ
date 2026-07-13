@@ -107,23 +107,31 @@ submitScoreBtn.addEventListener("click", async () => {
             timestamp: new Date().toISOString()
         };
 
-        await fetch(SCRIPT_URL, {
+        // Fire request to Google Sheets script without waiting for cross-origin response approval
+        fetch(SCRIPT_URL, {
             method: "POST",
-            mode: "no-cors", // Required for Google Apps Script redirects
+            mode: "no-cors", 
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
         });
         
-        // Advance to leaderboard view and fetch fresh rankings
+        // Optimistic transition to leaderboard screen after network trigger
+        setTimeout(() => {
+            submissionScreen.style.display = "none";
+            leaderboardScreen.style.display = "block";
+            fetchLeaderboard();
+        }, 600);
+
+    } catch (error) {
+        console.error("Sheets connection failure: ", error);
+        // Fallback safety route
         submissionScreen.style.display = "none";
         leaderboardScreen.style.display = "block";
         fetchLeaderboard();
-    } catch (error) {
-        console.error("Sheets connection failure: ", error);
-        alert("Oops! Something went wrong submitting your score.");
     } finally {
+        // Reset button states for future attempts
         submitScoreBtn.disabled = false;
         submitScoreBtn.innerText = "Enter Gateway ➔";
     }

@@ -29,7 +29,12 @@
         <div id="submission-screen" style="display: none;">
             <h1 class="title">🎉 Yay! Finished! 🎉</h1>
             <div class="score-badge">
-                <span id="final-score">0</span> / 5
+            <span id="final-score">0</span> / <span id="total-questions">5</span>
+            </div>
+            ...
+            <input type="text" id="username" placeholder="Type your name..." autocomplete="off" maxlength="20">
+            <p id="status-msg" role="alert"></p>
+            <button id="submit-score-btn" class="magic-btn submit-btn">Enter Gateway ➔</button>
             </div>
             <p class="subtitle">Claim your spot on the magical leaderboard!</p>
             <div class="input-group">

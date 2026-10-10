@@ -206,3 +206,7 @@ td {
 tr:nth-child(1) td { color: #d4af37; font-size: 1.2rem; } /* Gold first place */
 tr:nth-child(2) td { color: #aaa9ad; } /* Silver second */
 tr:nth-child(3) td { color: #b47b59; } /* Bronze third */
+#status-msg { color: #c62828; min-height: 1.2em; margin: 10px 0 0; }
+tr.you td { background: #fff0f3; outline: 2px solid #ff8fa3; outline-offset: -2px; }
+.retry-link { background: none; border: none; color: #b5179e; cursor: pointer; text-decoration: underline; font-size: inherit; }
+.score-badge { font-size: 3rem; line-height: 140px; }
